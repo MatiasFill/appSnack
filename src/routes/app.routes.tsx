@@ -40,7 +40,7 @@ function AppRoutes(){
           options={{
             title: 'Finalizando',
             headerStyle:{
-              backgroundColor: '#1d1d2e'
+              backgroundColor: 'rgba(119, 7, 7, 0.96)'
             },
             headerTintColor: '#FFF'
           }}

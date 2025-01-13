@@ -45,7 +45,7 @@ async function openOrder(){
       />
 
       <TouchableOpacity style={styles.button} onPress={openOrder}>
-          <Text style={styles.buttonText}>Abrir mesa</Text>
+          <Text style={styles.buttonText}>Abrir Mesa</Text>
       </TouchableOpacity>
 
     </SafeAreaView>
@@ -79,15 +79,15 @@ const styles = StyleSheet.create({
   button:{
     width: '90%',
     height: 40,
-    backgroundColor: '#3fffa3',
+    backgroundColor: '#8B0000',
     borderRadius: 4,
     marginVertical: 12,
     justifyContent: 'center',
     alignItems: 'center'
   },
   buttonText:{
-    fontSize: 18,
-    color: '#101026',
+    fontSize: 20,
+    color: '#FFF',
     fontWeight: 'bold'
   }
 })

@@ -46,7 +46,7 @@ export  default function FinishOrder(){
 
             <TouchableOpacity style={styles.button} onPress={handleFinish}>
                 <Text style={styles.textButton}>Finalizar pedido</Text>
-                <Feather name="shopping-cart" size={20} color="#1d1d2e" />
+                <Feather name="shopping-cart" size={23} color="#3fd1ff" />
             </TouchableOpacity>
         </View>
     )
@@ -61,19 +61,19 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     alert:{
-        fontSize: 20,
+        fontSize: 18,
         color: '#FFF',
         fontWeight: 'bold',
         marginBottom: 12,
     },
     title:{
-        fontSize: 30,
+        fontSize: 25,
         fontWeight: 'bold',
         color: '#FFF',
         marginBottom: 12,
     },
     button:{
-        backgroundColor: '#00ffff',
+        backgroundColor: '#8B0000',
         flexDirection: 'row',
         width: '65%',
         height: 40,
@@ -82,9 +82,9 @@ const styles = StyleSheet.create({
         borderRadius: 4,
     },
     textButton:{
-        fontSize: 18,
+        fontSize: 20,
         marginRight: 8,
         fontWeight: 'bold',
-        color: '#1d1d2e',
+        color: '#FFF',
     }
 })

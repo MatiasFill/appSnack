@@ -209,7 +209,7 @@ export default function Order(){
                 </TouchableOpacity>
                  {/*aqui abaixo é o botom de avançar */}
                 <TouchableOpacity
-                    style={[styles.button, { opacity: items.length === 0 ? 0.3 : 1} ]}
+                    style={[styles.button, { opacity: items.length === 0 ? 0.1 : 1} ]}
                     disabled={items.length === 0}
                     onPress={handleFinishOrder} 
                 >
@@ -314,19 +314,19 @@ const styles = StyleSheet.create({
     },
     buttonAdd:{
         width: '20%',
-        backgroundColor: '#3fd1ff',
+        backgroundColor: 'rgba(119, 7, 7, 0.96)',
         borderRadius: 4,
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
     },
     buttonText:{
-        color: '#101026',
-        fontSize: 18,
+        color: '#FFF',
+        fontSize: 25,
         fontWeight: 'bold'
     },
     button:{
-        backgroundColor: '#3fffa3',
+        backgroundColor: '#8B0000',
         borderRadius: 4,
         height: 40,
         width: '75%',
