@@ -5,15 +5,19 @@ import { View,
     TouchableOpacity,
     TextInput,
     Modal,
+    FlatList //trabalhar com lista de forma dinamica ou listas grande e performas
  } from "react-native";
- import { ModalPicker} from '../../components/ModalPicker'
 
 // tambem podemos pegar os parametros com " useRoute com sua propriedade " RouteProp"
 import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
 
 import { Feather} from '@expo/vector-icons'
-
 import { api } from "../../services/api";
+import { ModalPicker} from '../../components/ModalPicker'
+import { ListItem } from "../../components/ListItem";
+
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { StackPramsList } from "../../routes/app.routes";
 
 
 type RouteDetailParams = {// Criando uma tipagem do Router
@@ -31,11 +35,19 @@ type ProductsProps = {
     id: string;
     name: string;
 }
+
+type ItemProps = {// criando uma tipagens
+    id: string;
+    product_id: string;
+    name: string;
+    amount: string | number;  //amount é quantidade
+}
+
 type OrderRouteProps = RouteProp<RouteDetailParams, 'Order'>
 
 export default function Order(){
     const route = useRoute<OrderRouteProps>();
-    const navigation = useNavigation();
+    const navigation = useNavigation<NativeStackNavigationProp<StackPramsList>>();
     // criando os estados com duas useState
     const [category, setCategory] = useState<CategoryProps[] | []>([]) // criando os estados, armazena as listagens de todas
     const [categorySelected, setCategorySelected] = useState<CategoryProps | undefined>()//essa aponta p/ a que esta selecionada atualmente. pego o item que me mandou e troca a categoria selecionada
@@ -47,6 +59,7 @@ export default function Order(){
     const [modalProductVisible, setmodalProductVisible] = useState(false);
 // toda vez que digitar a quantidade de um produto vai ser salvo nessa useState chamado "amount"
     const [amount, setamount] = useState('1')// o estado que vai controlar a quntidade 
+    const [items, setItems] = useState<ItemProps[]>([]); // salvar os itens do pedido dentro de uma lista de ietm Props[]
    // agora vamos buscar as categorias com useEffect criando uma função anõnima
     useEffect(()=> {
         async function loadInfo(){// fazendo a requisição buscando as categorias aqui dentro
@@ -102,14 +115,65 @@ export default function Order(){
         setProductSelected(item);
     }
 
+    // Aqui você vai adicionar um produto nessa mesa. 
+    async function handleAdd(){         //Aqui faço uma chamada na " /order/add"
+        const response = await api.post('/order/add',{
+            order_id: route.params?.order_id, // recebo o id da que vem da rota order.id
+            product_id:productSelected?.id,// aqui eu passo o produto selecionado que vem do productSelected
+            amount: Number(amount)// digito dentro do Textinput coloco dentro de uma useState, Amount, agora estou pegando essea informacao
+        })
+
+        // agora vou repassar o que eu recebo atravez " /order/add" atravez do response p/ "let data"
+        let data = {
+            id: response.data.id,
+            product_id: productSelected?.id as string,
+            name: productSelected?.name as string,
+            amount: amount
+        }
+        //aqui estou passando todo o objeto que esta acima o "let data" para nossa useState atravez do setItem
+        
+        setItems(oLdArray => [...oLdArray, data])
+    }    
+
+
+    // aqui estou deletando um item da minha lista
+    async function handleDeleteItem(item_id: string){
+        await api.delete('/order/remove', {
+            params:{
+                item_id: item_id
+            }
+        })
+    
+
+        // aqui vamos remover um item e atualizar a lista de item.
+        let removeItem = items.filter( item => {
+        /*esse "item.id" é igual o que vc esta me mandando aqui, se for igual eu tiro da minha lista, 
+        agora se não for igual eu coloco esse item dentro da variavel "removeItem"  */  
+         return (item.id !== item_id)
+        })
+    
+        setItems(removeItem)// aqui passo toda nossa array ja tirando o item que clicou para deletar    
+    }
+
+
+
+        function handleFinishOrder(){
+            navigation.navigate('FinishOrder', {
+                number:route.params?.number, 
+                order_id: route.params?.order_id
+            }) // navegando até a tela de finalizar order do pedido 
+        }
+
     return(
         <View style={styles.container}>
            
            <View style={styles.header}>
                 <Text style={styles.title}>Mesa {route.params.number}</Text>
-                <TouchableOpacity onPress={handleCloseOrder}>
-                    <Feather name="trash-2" size={28} color="#FF3F4b" />
-                </TouchableOpacity>
+                {items.length === 0 && (
+                    <TouchableOpacity onPress={handleCloseOrder}>
+                        <Feather name="trash-2" size={28} color="#FF3F4b" />
+                    </TouchableOpacity>
+                )}
            </View> 
 
             {category.length !== 0 && (           // mundado o seModalCategoryVisible de false p/ true, para o modal ficar visivel.
@@ -140,17 +204,30 @@ export default function Order(){
             </View>   
 
             <View style={styles.actions}>
-                <TouchableOpacity style={styles.buttonAdd}>
+                <TouchableOpacity style={styles.buttonAdd} onPress={handleAdd}>
                     <Text style={styles.buttonText}> + </Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity style={styles.button}>
+                 {/*aqui abaixo é o botom de avançar */}
+                <TouchableOpacity
+                    style={[styles.button, { opacity: items.length === 0 ? 0.3 : 1} ]}
+                    disabled={items.length === 0}
+                    onPress={handleFinishOrder} 
+                >
                     <Text style={styles.buttonText}>Avançar</Text>
                 </TouchableOpacity>
             </View>
             
 
 
+
+
+            <FlatList
+                showsVerticalScrollIndicator={false}
+                style={{ flex: 1, marginTop: 24 }} // aqui esta stilizando direto na linha
+                data={items} // data basicamente é sua lista de item que vai estar dentro de uma useState "item"
+                keyExtractor={(item) => item.id } // aqui é pra saber o " id " de cada item
+                renderItem={({ item }) => <ListItem data={item} deleteItem={handleDeleteItem} /> }//aqui é qual item que vai ser renderizado. como queremos renderizar os componentes. passando a propriedade item para data
+            />
 
 
             <Modal
@@ -255,5 +332,5 @@ const styles = StyleSheet.create({
         width: '75%',
         alignItems: 'center',
         justifyContent: 'center'
-    }
+    },
 })
